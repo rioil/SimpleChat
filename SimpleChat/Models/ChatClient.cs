@@ -203,6 +203,7 @@ namespace SimpleChat.Models
             }
             offset += contentLength;
             var content = Encoding.UTF8.GetString(contentBytes);
+            ArrayPool<byte>.Shared.Return(contentBytes);
 
             // return message
             buffer = buffer.Slice(buffer.GetPosition(offset, buffer.Start));

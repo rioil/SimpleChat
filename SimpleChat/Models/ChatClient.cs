@@ -17,7 +17,7 @@ namespace SimpleChat.Models
     {
         private TcpClient? _client;
         private readonly IPEndPoint _peer;
-        private readonly Pipe _pipe = new();
+        //private readonly Pipe _pipe = new();
         private CancellationTokenSource? _cts;
         private Task? _receiveTask;
 
@@ -84,9 +84,11 @@ namespace SimpleChat.Models
         {
             if (_client is null) { throw new InvalidOperationException(); }
             var stream = _client.GetStream();
-            var fillTask = StartFillTask(stream, _pipe.Writer, cancellationToken);
-            var parseTask = StartParseTask(_pipe.Reader, cancellationToken);
-            await Task.WhenAll(fillTask, parseTask);
+            //var fillTask = StartFillTask(stream, _pipe.Writer, cancellationToken);
+            //var parseTask = StartParseTask(_pipe.Reader, cancellationToken);
+            //await Task.WhenAll(fillTask, parseTask);
+            var parseTask = StartParseTask(PipeReader.Create(stream), cancellationToken);
+            await parseTask;
         }
 
         private static Task StartFillTask(NetworkStream stream, PipeWriter writer, CancellationToken cancellationToken)

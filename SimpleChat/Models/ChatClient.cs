@@ -202,7 +202,7 @@ namespace SimpleChat.Models
                 return false;
             }
             offset += contentLength;
-            var content = Encoding.UTF8.GetString(contentBytes);
+            var content = Encoding.UTF8.GetString(contentBytes.AsSpan()[..contentLength]);
             ArrayPool<byte>.Shared.Return(contentBytes);
 
             // return message

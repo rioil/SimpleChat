@@ -1,14 +1,16 @@
 ﻿using Livet;
 using Livet.Commands;
 using SimpleChat.Models;
+using System;
 using System.Collections.ObjectModel;
-using System.Net;
 
 namespace SimpleChat.ViewModels
 {
     public class ChatViewModel : ViewModel
     {
         private readonly ChatClient _chatClient = new("127.0.0.1", ChatServer.DefaultPort);
+
+        public int MyId { get; set; } = Random.Shared.Next();
 
         public ObservableCollection<Message> Messages
         {
@@ -20,7 +22,13 @@ namespace SimpleChat.ViewModels
         public string Content
         {
             get => _content;
-            set => RaisePropertyChangedIfSet(ref _content, value);
+            set
+            {
+                if (RaisePropertyChangedIfSet(ref _content, value))
+                {
+                    SendMessageCommand.RaiseCanExecuteChanged();
+                }
+            }
         }
         private string _content = string.Empty;
 
@@ -32,10 +40,14 @@ namespace SimpleChat.ViewModels
 
         public async void SendMessage()
         {
-            await _chatClient.SendMessageAsync(new Message(IPAddress.Loopback, Content));
+            await _chatClient.SendMessageAsync(new Message(MyId, DateTime.Now, Content));
             Content = string.Empty;
         }
-        public ViewModelCommand SendMessageCommand => _sendMessageCommand ??= new ViewModelCommand(SendMessage);
+        private bool CanSendMessage()
+        {
+            return !string.IsNullOrEmpty(Content);
+        }
+        public ViewModelCommand SendMessageCommand => _sendMessageCommand ??= new ViewModelCommand(SendMessage, CanSendMessage);
         private ViewModelCommand? _sendMessageCommand;
 
         private void OnMessageReceived(Message message)

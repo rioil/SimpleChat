@@ -9,7 +9,7 @@
   <UserControl.DataContext>
     <vm:ChatViewModel/>
   </UserControl.DataContext>
-  
+
   <Grid>
     <Grid.RowDefinitions>
       <RowDefinition Height="25" />
@@ -23,7 +23,11 @@
     <ListBox Grid.Row="1" ItemsSource="{Binding Messages}">
       <ListBox.ItemTemplate>
         <DataTemplate>
-          <TextBlock Text="{Binding Content}"/>
+          <StackPanel Orientation="Horizontal">
+            <TextBlock Text="{Binding Sent, StringFormat=HH:mm}" Foreground="Gray" Margin="0,0,5,0"/>
+            <TextBlock Text="{Binding SenderId}" Margin="0,0,5,0" Foreground="Gray"/>
+            <TextBlock Text="{Binding Content}"/>
+          </StackPanel>
         </DataTemplate>
       </ListBox.ItemTemplate>
     </ListBox>
@@ -32,7 +36,8 @@
       <Button Width="100" Content="Send"
               DockPanel.Dock="Right"
               Command="{Binding SendMessageCommand}"/>
-      <TextBox Text="{Binding Content}"/>
+      <TextBox Text="{Binding Content, UpdateSourceTrigger=PropertyChanged}"
+               VerticalContentAlignment="Center"/>
     </DockPanel>
   </Grid>
 </UserControl>

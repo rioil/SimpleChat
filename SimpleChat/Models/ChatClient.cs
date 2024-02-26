@@ -167,16 +167,27 @@ namespace SimpleChat.Models
             }
             offset += headerLength;
 
-            // get sender IPv4 address (4bytes)
-            const int addressLength = 4;
-            Span<byte> addressBytes = stackalloc byte[addressLength];
-            if (!TryGetSliced(buffer, offset, addressLength, addressBytes))
+            // get sender id (4bytes)
+            const int senderIdLength = 4;
+            Span<byte> senderIdBytes = stackalloc byte[senderIdLength];
+            if (!TryGetSliced(buffer, offset, senderIdLength, senderIdBytes))
             {
                 message = default;
                 return false;
             }
-            var address = new IPAddress(addressBytes);
-            offset += addressLength;
+            var address = BitConverter.ToInt32(senderIdBytes);
+            offset += senderIdLength;
+
+            // get sent time (8bytes)
+            const int sentTimeLength = 8;
+            Span<byte> sentTimeBytes = stackalloc byte[sentTimeLength];
+            if (!TryGetSliced(buffer, offset, sentTimeLength, sentTimeBytes))
+            {
+                message = default;
+                return false;
+            }
+            var sentTime = new DateTime(BitConverter.ToInt64(sentTimeBytes));
+            offset += sentTimeLength;
 
             // get length of message (4bytes)
             const int lengthLength = 4;
@@ -207,7 +218,7 @@ namespace SimpleChat.Models
 
             // return message
             buffer = buffer.Slice(buffer.GetPosition(offset, buffer.Start));
-            message = new Message(address, content);
+            message = new Message(address, sentTime, content);
             return true;
 
             static bool TryGetSliced(ReadOnlySequence<byte> buffer, int offset, int length, Span<byte> sliced)

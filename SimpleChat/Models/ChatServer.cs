@@ -78,7 +78,7 @@ namespace SimpleChat.Models
         private void OnMessageReceived(Message message)
         {
             _messageChannel.Writer.TryWrite(message);
-            Debug.WriteLine($"{nameof(OnMessageReceived)}: Message Received {message.Sender} {message.Content}");
+            Debug.WriteLine($"{nameof(OnMessageReceived)}: Message Received {message.SenderId} {message.Content}");
         }
     }
 }
